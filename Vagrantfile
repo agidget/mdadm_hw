@@ -1,11 +1,6 @@
 # -*- mode: ruby -*-
 # vim: set ft=ruby :
 
-# !!!
-# before everything please install vbguest plugin version 0.21 by running this cmd
-# vagrant plugin install vagrant-vbguest --plugin-version 0.21
-# why not the default one - https://github.com/dotless-de/vagrant-vbguest/issues/362
-
 
 MACHINES = {
   :otuslinux => {
@@ -42,20 +37,19 @@ MACHINES = {
 }
 
 Vagrant.configure("2") do |config|
-        if Vagrant.has_plugin?("vagrant-vbguest")
-                config.vbguest.auto_update = false
-        end
 
   MACHINES.each do |boxname, boxconfig|
 
       config.vm.define boxname do |box|
 
           box.vm.box = boxconfig[:box_name]
+        #   https://www.puppeteers.net/blog/fixing-vagrant-vbguest-for-the-centos-7-base-box/
+          box.vbguest.installer_options = { allow_kernel_upgrade: true }
           box.vm.host_name = boxname.to_s
 
-          #box.vm.network "forwarded_port", guest: 3260, host: 3260+offset
+        #   box.vm.network "forwarded_port", guest: 3260, host: 3260+offset
 
-        #   box.vm.network "private_network", ip: boxconfig[:ip_addr]
+          box.vm.network "private_network", ip: boxconfig[:ip_addr]
 
           box.vm.provider :virtualbox do |vb|
             	  vb.customize ["modifyvm", :id, "--memory", "1024"]
